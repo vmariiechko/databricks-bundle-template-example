@@ -1,0 +1,46 @@
+# ============================================================================
+# Unity Catalog Schema Resources
+# ============================================================================
+#
+# IMPORTANT: Schema resources are created if they don't exist and managed by
+# the bundle. The owner is always the deployment user/service principal.
+#
+# Schema names include ${var.schema_prefix} for per-target isolation:
+# - User target: <username>_bronze, <username>_silver, <username>_gold
+# - Dev/Stage/Prod: bronze, silver, gold (no prefix)
+#
+# Grants are configured per-target in databricks.yml to ensure:
+# - User target: No SP references (works without SP configuration)
+# - CI/CD targets: SP grants added via target overrides
+#
+# Documentation: https://docs.databricks.com/aws/en/dev-tools/bundles/resources#schema-unity-catalog
+# ============================================================================
+
+resources:
+  schemas:
+    bronze_schema:
+      name: ${var.schema_prefix}bronze
+      catalog_name: ${var.catalog_name}
+      comment: "Bronze layer: Raw ingested data with minimal transformations"
+      properties:
+        environment: ${bundle.target}
+        managed_by: databricks_bundle
+        data_classification: raw
+
+    silver_schema:
+      name: ${var.schema_prefix}silver
+      catalog_name: ${var.catalog_name}
+      comment: "Silver layer: Validated and enriched business data"
+      properties:
+        environment: ${bundle.target}
+        managed_by: databricks_bundle
+        data_classification: curated
+
+    gold_schema:
+      name: ${var.schema_prefix}gold
+      catalog_name: ${var.catalog_name}
+      comment: "Gold layer: Aggregated analytics and reporting data"
+      properties:
+        environment: ${bundle.target}
+        managed_by: databricks_bundle
+        data_classification: aggregated

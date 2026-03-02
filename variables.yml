@@ -1,0 +1,75 @@
+variables:
+  # ================================================
+  # Unity Catalog Configuration
+  # ================================================
+  catalog_name:
+    description: Unity Catalog name (override per target in databricks.yml)
+    default: "dev_analytics"
+
+  schema_prefix:
+    description: Prefix for schema names (provides per-user isolation in development)
+    default: "${workspace.current_user.short_name}_"
+
+  default_schema_name:
+    description: Default schema for resources
+    default: "bronze"
+
+  # ================================================
+  # LDP Pipeline Configuration
+  # ================================================
+  pipeline_min_workers:
+    description: Min workers for pipeline autoscale (custom clusters only)
+    default: 1
+
+  pipeline_max_workers:
+    description: Max workers for pipeline autoscale (custom clusters only)
+    default: 4
+
+  photon_enabled:
+    description: Enable Photon acceleration
+    default: true
+
+  continuous_mode:
+    description: Run pipeline continuously (vs triggered)
+    default: false
+
+  # ================================================
+  # Job Configuration
+  # ================================================
+  job_cluster_min_workers:
+    description: Min workers for job cluster autoscale (custom clusters only)
+    default: 1
+
+  job_cluster_max_workers:
+    description: Max workers for job cluster autoscale (custom clusters only)
+    default: 4
+
+  failure_notification_emails:
+    description: Email addresses for job failure alerts
+    default: []
+
+  max_retries:
+    description: Max retries for failed job tasks
+    default: 2
+
+  retry_interval_millis:
+    description: Wait time between retries (ms)
+    default: 300_000
+
+  # ================================================
+  # Service Principals (for CI/CD deployments)
+  # ================================================
+  # Set service principals using one of methods:
+  # * Set values directly here for `default:` key
+  # * CLI: databricks bundle deploy -t dev --var="dev_service_principal=<app-id>,..."
+  # * Env variable: BUNDLE_VAR_dev_service_principal=<app-id>
+  #
+  # NOTE: Search for "SP_PLACEHOLDER" to find and replace these values
+  # with your actual service principal application IDs.
+
+  stage_service_principal:
+    description: Service principal app ID for stage environment
+    default: "SP_PLACEHOLDER_STAGE"  # Replace with your stage SP app ID
+  prod_service_principal:
+    description: Service principal app ID for prod environment
+    default: "SP_PLACEHOLDER_PROD"  # Replace with your prod SP app ID

@@ -1,0 +1,24 @@
+resources:
+  jobs:  # https://docs.databricks.com/aws/en/dev-tools/bundles/resources#job
+    my_data_project_pipeline_trigger:
+      name: my_data_project Pipeline Trigger
+      max_concurrent_runs: 1
+      timeout_seconds: 0  # No timeout
+
+      email_notifications:
+        on_failure: ${var.failure_notification_emails}
+
+      notification_settings:
+        no_alert_for_skipped_runs: true
+        no_alert_for_canceled_runs: true
+
+      schedule:
+        quartz_cron_expression: 0 0 * * * ?  # hourly
+        timezone_id: UTC
+        pause_status: PAUSED  # Default to paused; targets override as needed
+
+      tasks:  # https://docs.databricks.com/aws/en/dev-tools/bundles/job-task-types#other-task-settings
+        - task_key: trigger_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.my_data_project_pipeline.id}
+            # full_refresh: false  # Set to true for full refresh runs

@@ -1,0 +1,196 @@
+# This is a Databricks asset bundle definition for my_data_project.
+# See https://docs.databricks.com/aws/en/dev-tools/bundles for documentation.
+#
+# Generated with: databricks bundle init
+# Compute type: classic
+# Environment setup: full
+# Permissions: Disabled (configure manually if needed)
+
+bundle:
+  name: my_data_project
+  databricks_cli_version: '>= 0.274.0'
+
+# Experimental features configuration
+experimental:
+  # Skip adding prefix to Unity Catalog schema names
+  # This keeps schema names consistent across environments (bronze, silver, gold)
+  # while other resources (jobs, pipelines) still get environment prefixes
+  skip_name_prefix_for_schema: true
+
+include:
+  - resources/*.yml
+  - variables.yml
+
+targets:
+  # ------------------------
+  # Local Development Target
+  # ------------------------
+  user:
+    mode: development
+    default: true
+    presets:
+      name_prefix: "[user ${workspace.current_user.short_name}] "
+      trigger_pause_status: PAUSED
+      pipelines_development: true
+      tags:
+        environment: user
+    workspace:
+      host: https://your-workspace.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+
+    #### Variables ####
+    # User target shares the dev catalog; isolation via user-prefixed schema names
+    # e.g., jsmith_bronze, jsmith_silver, jsmith_gold
+    variables:
+      catalog_name: "dev_analytics"
+      schema_prefix: "${workspace.current_user.short_name}_"
+      default_schema_name: "bronze"
+      pipeline_min_workers: 1
+      pipeline_max_workers: 1
+      photon_enabled: false
+      continuous_mode: false
+      failure_notification_emails: []
+      job_cluster_min_workers: 1
+      job_cluster_max_workers: 1
+      max_retries: 0  # No retries in dev mode - fail fast
+
+    #### Resource Overrides ####
+    resources:
+      jobs:
+        my_data_project_ingestion:
+          # Override schedule - don't run automatically in user env
+          schedule:
+            quartz_cron_expression: 0 0 2 * * ?  # Same time but paused
+            timezone_id: UTC
+            pause_status: PAUSED
+
+        my_data_project_pipeline_trigger:
+          schedule:
+            quartz_cron_expression: 0 0 * * * ?
+            timezone_id: UTC
+            pause_status: PAUSED
+
+  # -------------------
+  # Staging Environment
+  # -------------------
+  stage:
+    mode: production
+    presets:
+      name_prefix: "[stage] "
+      tags:
+        environment: stage
+    workspace:
+      host: https://your-workspace.cloud.databricks.com
+      root_path: /Workspace/${bundle.target}/.bundle/${bundle.name}
+    git:
+      branch: main
+    run_as:
+      service_principal_name: ${var.stage_service_principal}
+
+    #### Variables ####
+    variables:
+      catalog_name: "stage_analytics"
+      schema_prefix: ""
+      default_schema_name: "bronze"
+      pipeline_min_workers: 2
+      pipeline_max_workers: 4
+      photon_enabled: true
+      continuous_mode: false
+      failure_notification_emails:
+        - ${workspace.current_user.emails[0].value}
+      max_retries: 2  # Production-like retry behavior
+      retry_interval_millis: 300_000  # 5 minutes
+      job_cluster_min_workers: 2
+      job_cluster_max_workers: 5
+
+    #### Resource Overrides ####
+    resources:
+
+      jobs:
+        my_data_project_ingestion:
+          # Longer timeout for production-like workloads
+          timeout_seconds: 7200  # 2 hours
+          # Production-like schedule - multiple runs per day for testing
+          schedule:
+            quartz_cron_expression: 0 0 4,16 * * ?  # At 04:00 AM and 04:00 PM
+            timezone_id: UTC
+            pause_status: UNPAUSED
+
+        my_data_project_pipeline_trigger:
+          # Higher concurrency for testing load
+          max_concurrent_runs: 2
+          schedule:
+            quartz_cron_expression: 0 30 4,16 * * ?  # 30 min after ingestion
+            timezone_id: UTC
+            pause_status: UNPAUSED
+
+  # ----------------------
+  # Production Environment
+  # ----------------------
+  prod:
+    mode: production
+    presets:
+      name_prefix: "[prod] "
+      tags:
+        environment: prod
+    workspace:
+      host: https://your-workspace.cloud.databricks.com
+      root_path: /Workspace/${bundle.target}/.bundle/${bundle.name}
+    git:
+      branch: release
+    run_as:
+      service_principal_name: ${var.prod_service_principal}
+
+    #### Variables ####
+    variables:
+      catalog_name: "prod_analytics"
+      schema_prefix: ""
+      default_schema_name: "bronze"
+      pipeline_min_workers: 2
+      pipeline_max_workers: 8
+      photon_enabled: true
+      # continuous_mode: true  # Uncomment for continuous pipelines
+      failure_notification_emails:
+        - ${workspace.current_user.emails[0].value}
+      max_retries: 3  # Maximum retries for production reliability
+      retry_interval_millis: 600_000  # 10 minutes between retries
+      job_cluster_min_workers: 2
+      job_cluster_max_workers: 8
+
+    #### Resource Overrides ####
+    resources:
+
+      jobs:
+        my_data_project_ingestion:
+          # Extended timeout for production data volumes
+          timeout_seconds: 14400  # 4 hours
+          # Production schedule - daily at off-peak hours
+          schedule:
+            quartz_cron_expression: 0 0 1 * * ?  # At 01:00 AM daily
+            timezone_id: UTC
+            pause_status: UNPAUSED
+          # Production-grade email notifications
+          email_notifications:
+            on_failure: ${var.failure_notification_emails}
+            on_start: []
+            on_success: []
+
+        my_data_project_pipeline_trigger:
+          # Production - one at a time for consistency
+          max_concurrent_runs: 1
+          schedule:
+            quartz_cron_expression: 0 0 6 * * ?  # At 06:00 AM (after ingestion completes)
+            timezone_id: UTC
+            pause_status: UNPAUSED
+
+      pipelines:
+        my_data_project_pipeline:
+          # Production schema
+          schema: "bronze"
+          # Production clusters would be defined here when not using serverless
+          # clusters:
+          #   - label: default
+          #     autoscale:
+          #       min_workers: 3
+          #       max_workers: 10
+          #     node_type_id: i3.xlarge
