@@ -4,7 +4,7 @@ A Databricks Asset Bundle for multi-environment deployment with user, stage, and
 
 ## Template Source
 
-This project was generated from the Databricks Asset Bundles template:
+This project was generated from the Databricks Asset Bundles template:<br>
 https://github.com/vmariiechko/databricks-bundle-template
 
 For template updates, fixes, and release notes, check the template repository.
