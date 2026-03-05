@@ -28,6 +28,8 @@ Before deploying, ensure you have:
    - `stage_analytics` (pre-production)
    - `prod_analytics` (production)
 
+> **Before you start**: Update the `workspace.host` in `databricks.yml` — replace `your-workspace.cloud.databricks.com` with your actual Databricks workspace URL (find it in your browser when logged in).
+
 ### Quick Deploy
 
 ```bash
@@ -206,3 +208,13 @@ See the pipeline notebooks in `src/pipelines/` for examples.
 - [Databricks Asset Bundles](https://docs.databricks.com/aws/en/dev-tools/bundles)
 - [Lakeflow Declarative Pipelines](https://docs.databricks.com/aws/en/ldp/)
 - [CI/CD on Databricks](https://docs.databricks.com/aws/en/dev-tools/ci-cd)
+
+---
+
+## About This Repository
+
+This project is a pre-generated example from [databricks-bundle-template](https://github.com/vmariiechko/databricks-bundle-template).
+It is periodically regenerated when the template is updated.
+
+- To report issues with the bundle structure or configuration: open an issue in the **[template repo](https://github.com/vmariiechko/databricks-bundle-template/issues)**
+- This repository is not intended for direct contribution — fix the template, then regenerate
