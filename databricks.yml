@@ -1,4 +1,4 @@
-# This is a Databricks asset bundle definition for my_data_project.
+# This is a Declarative automation bundle definition for my_data_project.
 # See https://docs.databricks.com/aws/en/dev-tools/bundles for documentation.
 #
 # Generated with: databricks bundle init
@@ -8,7 +8,8 @@
 
 bundle:
   name: my_data_project
-  databricks_cli_version: '>= 0.274.0'
+  databricks_cli_version: '>= 0.296.0'
+  engine: direct
 
 # Experimental features configuration
 experimental:

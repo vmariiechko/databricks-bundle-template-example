@@ -1,6 +1,6 @@
 # GitHub Actions Workflow for my_data_project
 #
-# This workflow validates and deploys Databricks Asset Bundles:
+# This workflow validates and deploys Declarative Automation Bundles:
 # - bundle-ci: Validates bundle configuration on Pull Requests to main
 # - staging-cd: Deploys to staging when PRs are merged into main
 # - prod-cd: Deploys to production when PRs are merged into release
@@ -100,7 +100,7 @@ jobs:
           token: ${{ github.token }}
 
       - name: Install Databricks CLI
-        uses: databricks/setup-cli@v0.274.0
+        uses: databricks/setup-cli@v0.296.0
 
       - name: Validate bundle for staging
         env:
@@ -134,7 +134,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Databricks CLI
-        uses: databricks/setup-cli@v0.274.0
+        uses: databricks/setup-cli@v0.296.0
 
       - name: Validate bundle for staging
         env:
@@ -168,7 +168,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Databricks CLI
-        uses: databricks/setup-cli@v0.274.0
+        uses: databricks/setup-cli@v0.296.0
 
       - name: Validate bundle for production
         env:

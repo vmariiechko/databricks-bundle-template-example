@@ -1,10 +1,10 @@
 # Databricks Bundle Template Example
 
-A Databricks Asset Bundle for multi-environment deployment with user, stage, and prod environments.
+A Declarative Automation Bundle for multi-environment deployment with user, stage, and prod environments.
 
 ## Template Source
 
-This project was generated from the Databricks Asset Bundles template:<br>
+This project was generated from the Declarative Automation Bundles template:<br>
 https://github.com/vmariiechko/databricks-bundle-template
 
 For template updates, fixes, and release notes, check the template repository.
@@ -17,7 +17,7 @@ For template updates, fixes, and release notes, check the template repository.
 
 Before deploying, ensure you have:
 
-1. **Databricks CLI** minimum version v0.274.0 installed ([reference docs](https://docs.databricks.com/aws/en/dev-tools/cli/install))
+1. **Databricks CLI** minimum version v0.296.0 installed ([reference docs](https://docs.databricks.com/aws/en/dev-tools/cli/install))
    ```bash
    pip install databricks-cli
    databricks --version
@@ -205,7 +205,7 @@ See the pipeline notebooks in `src/pipelines/` for examples.
 ## Resources
 
 - [Unity Catalog](https://docs.databricks.com/aws/en/data-governance/unity-catalog)
-- [Databricks Asset Bundles](https://docs.databricks.com/aws/en/dev-tools/bundles)
+- [Declarative Automation Bundles](https://docs.databricks.com/aws/en/dev-tools/bundles)
 - [Lakeflow Declarative Pipelines](https://docs.databricks.com/aws/en/ldp/)
 - [CI/CD on Databricks](https://docs.databricks.com/aws/en/dev-tools/ci-cd)
 
